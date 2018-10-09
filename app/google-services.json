@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "720779403759",
+    "firebase_url": "https://social-truth.firebaseio.com",
+    "project_id": "social-truth",
+    "storage_bucket": "social-truth.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:720779403759:android:ec326475dd105ba5",
+        "android_client_info": {
+          "package_name": "com.younghu.android.socialtruth"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "720779403759-a56j9qbja4kg8kcfceu1tota710gjnp0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.younghu.android.socialtruth",
+            "certificate_hash": "a513b9c89162187bdfa3db078bf6a10a02af3962"
+          }
+        },
+        {
+          "client_id": "720779403759-ophfiaurea80l1va61gp91ns4nm5loom.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCTsQv70DMNKczPX0eUGDPR--EVHFRALDQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "720779403759-ukitcv33r3ck29uakrpcbggk4u0nc41a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
