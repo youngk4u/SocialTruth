@@ -11,8 +11,6 @@
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay"/>
 
-
-
     <include layout="@layout/content_main" />
 
     <android.support.design.widget.FloatingActionButton

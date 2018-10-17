@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorWhite">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageButton
+            android:id="@+id/imageButton"
+            android:background="@color/colorWhite"
+            android:src="@drawable/add_image"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginTop="24dp"
+            android:layout_width="240dp"
+            android:layout_height="240dp"
+            android:contentDescription="@string/click_image_button" />
+
+        <ProgressBar
+            android:id="@+id/progress"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_marginTop="100dp"
+            android:visibility="visible"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <EditText
+            android:id="@+id/questionEditText"
+            app:layout_constraintTop_toBottomOf="@+id/imageButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="16dp"
+            android:layout_weight="1"
+            android:hint="@string/your_question"
+            android:autofillHints=""
+            android:inputType="" />
+
+        <Button
+            android:id="@+id/createButton"
+            android:background="@drawable/button_yes"
+            app:layout_constraintTop_toBottomOf="@+id/questionEditText"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="64dp"
+            android:layout_marginEnd="64dp"
+            android:enabled="false"
+            android:textColor="@drawable/text_colors"
+            android:text="@string/create"/>
+
+    </android.support.constraint.ConstraintLayout>
+
+</ScrollView>

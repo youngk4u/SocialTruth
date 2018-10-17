@@ -28,9 +28,10 @@
     <string name="server_client_id">720779403759-a56j9qbja4kg8kcfceu1tota710gjnp0.apps.googleusercontent.com</string>
 
 
-
-
     <!-- Description -->
     <string name="desc_google_signin_button">Google Sign in button</string>
+    <string name="click_image_button">Click Image Button</string>
+    <string name="your_question">Your question</string>
+    <string name="create">Create</string>
 
 </resources>
