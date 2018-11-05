@@ -65,7 +65,7 @@ public class EditProfileActivity extends AppCompatActivity {
     private String mNewUsername;
     private String mUserPhotoUrl = "http://qoopapp.com/testsite/img/PoyoSquared.png";
     private String mNewUserPhotoUrl;
-    private static final int RC_PHOTO_PICKER =  2;
+    private static final int RC_PHOTO_PICKER = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +75,6 @@ public class EditProfileActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
-        // FirebaseDatabase
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseStorage = FirebaseStorage.getInstance();
@@ -115,7 +114,6 @@ public class EditProfileActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
             }
 
             @Override
@@ -203,10 +201,10 @@ public class EditProfileActivity extends AppCompatActivity {
                                 updateQuestions(mNewUsername, mNewUserPhotoUrl);
                                 Toast.makeText(getApplicationContext(),
                                         "User profile updated.", Toast.LENGTH_SHORT).show();
+                                finish();
                             }
                         }
                     });
-            finish();
         }
         return super.onOptionsItemSelected(item);
     }

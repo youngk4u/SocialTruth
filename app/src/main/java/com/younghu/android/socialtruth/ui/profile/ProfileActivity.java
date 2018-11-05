@@ -185,19 +185,9 @@ public class ProfileActivity extends AppCompatActivity
                 @Override
                 public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                     Question question = dataSnapshot.getValue(Question.class);
-                    if (question != null) {
-                        for (int i = 0; i < questions.size(); i++) {
-                            if (questions.get(i).getQuestion().equals(question.getQuestion())) {
-                                questions.remove(i);
-                                questions.add(i, question);
-                                break;
-                            }
-                        }
+                    if (question != null && question.getAuthorId().equals(mUser.getUid())) {
+                        getVoterResult(question, mResultDatabaseReference);
                     }
-                    questionAdapter.notifyDataSetChanged();
-                    profileQuestionCount.setText(String.valueOf(questions.size()));
-                    layoutManager.smoothScrollToPosition(recyclerView, null,
-                            questionAdapter.getItemCount());
                 }
                 @Override
                 public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) { }
@@ -257,7 +247,20 @@ public class ProfileActivity extends AppCompatActivity
                 } else {
                     question.setIsAnswered(NOT_VOTED_YET);
                 }
-                questions.add(question);
+
+                boolean questionExists = false;
+                for (int i = 0; i < questions.size(); i++) {
+                    if (questions.get(i).getQuestion().equals(question.getQuestion())) {
+                        questions.remove(i);
+                        questions.add(i, question);
+                        questionExists = true;
+                        break;
+                    }
+                }
+                if (!questionExists) {
+                    questions.add(question);
+                }
+
                 profileQuestionCount.setText(String.valueOf(questions.size()));
                 questionAdapter.swapList(questions);
 

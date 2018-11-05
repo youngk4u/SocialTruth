@@ -230,17 +230,8 @@ public class MainActivity extends AppCompatActivity
                 public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                     Question question = dataSnapshot.getValue(Question.class);
                     if (question != null) {
-                        for (int i = 0; i < questions.size(); i++) {
-                            if (questions.get(i).getQuestion().equals(question.getQuestion())) {
-                                questions.remove(i);
-                                questions.add(i, question);
-                                break;
-                            }
-                        }
+                        getVoterResult(question, mResultDatabaseReference);
                     }
-                    questionAdapter.notifyDataSetChanged();
-                    layoutManager.smoothScrollToPosition(recyclerView, null,
-                            questionAdapter.getItemCount());
                 }
                 @Override
                 public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) { }
@@ -324,7 +315,19 @@ public class MainActivity extends AppCompatActivity
                 } else {
                     question.setIsAnswered(NOT_VOTED_YET);
                 }
-                questions.add(question);
+
+                boolean questionExists = false;
+                for (int i = 0; i < questions.size(); i++) {
+                    if (questions.get(i).getQuestion().equals(question.getQuestion())) {
+                        questions.remove(i);
+                        questions.add(i, question);
+                        questionExists = true;
+                        break;
+                    }
+                }
+                if (!questionExists) {
+                    questions.add(question);
+                }
                 questionAdapter.swapList(questions);
                 layoutManager.smoothScrollToPosition(recyclerView, null,
                         questionAdapter.getItemCount());

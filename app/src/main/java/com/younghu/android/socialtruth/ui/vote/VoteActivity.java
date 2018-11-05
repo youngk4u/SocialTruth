@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -24,7 +25,6 @@ import com.younghu.android.socialtruth.R;
 import com.younghu.android.socialtruth.data.Question;
 import com.younghu.android.socialtruth.data.Vote;
 
-import java.sql.SQLOutput;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -36,6 +36,7 @@ public class VoteActivity extends AppCompatActivity {
     private DatabaseReference mVoteDatabaseReference;
     private DatabaseReference mResultDatabaseReference;
 
+    private FirebaseAnalytics mFirebaseAnalytics;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mUser;
 
@@ -66,30 +67,28 @@ public class VoteActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
-        mFirebaseAuth = FirebaseAuth.getInstance();
-        mUser = mFirebaseAuth.getCurrentUser();
-
         Intent intent = getIntent();
         mQuestion = intent.getParcelableExtra("Question");
 
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mVoteDatabaseReference = mFirebaseDatabase.getReference().child("votes");
         mResultDatabaseReference = mFirebaseDatabase.getReference().child("voter_results");
+
+        mUser = mFirebaseAuth.getCurrentUser();
 
         authorName.setText(mQuestion.getAuthorUserName());
         Glide.with(getApplicationContext())
                 .load(mQuestion.getAuthorPhotoUrl())
                 .apply(new RequestOptions().circleCrop())
                 .into(authorImage);
-
         questionText.setText(mQuestion.getQuestion());
-
         Glide.with(getApplicationContext())
                 .load(mQuestion.getPhotoUrl())
                 .into(questionImage);
 
         if (mQuestion.getIsAnswered().equals(VOTED_YES) || mQuestion.getIsAnswered().equals(VOTED_NO)) {
-
             yesButton.setEnabled(false);
             noButton.setEnabled(false);
 
@@ -131,6 +130,12 @@ public class VoteActivity extends AppCompatActivity {
         userVote(VOTED_YES);
 
         yesButton.setBackgroundResource(R.drawable.button_yes_border);
+
+        // Firebase Analytics to capture which user voted for what
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "Yes " + mUser.getDisplayName());
+        bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "button");
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
     }
 
     @OnClick(R.id.vote_button2)
@@ -142,6 +147,12 @@ public class VoteActivity extends AppCompatActivity {
         userVote(VOTED_NO);
 
         noButton.setBackgroundResource(R.drawable.button_no_border);
+
+        // Firebase Analytics to capture which user voted for what
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "No " + mUser.getDisplayName());
+        bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "button");
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
     }
 
     private void voteQuery(final String voteResult) {
