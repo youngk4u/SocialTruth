@@ -6,9 +6,8 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -25,7 +24,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.vote.VoteActivity" />
-        <activity android:name=".ui.create.CreateQuestion"></activity>
+        <activity android:name=".ui.create.CreateQuestion" />
+        <activity android:name=".ui.profile.ProfileActivity"
+            android:theme="@style/AppThemeAlternative"/>
+        <activity android:name=".ui.profile.EditProfileActivity"
+            android:theme="@style/AppThemeAlternative"/>
     </application>
 
 </manifest>

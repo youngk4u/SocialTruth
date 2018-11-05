@@ -1,10 +1,12 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.younghu.android.socialtruth.ui.main.MainActivity">
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/action_profile"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+        app:showAsAction="always"
+        android:title="@string/profile"
+        android:icon="@drawable/ic_account_circle"/>
+
 </menu>

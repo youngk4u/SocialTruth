@@ -1,4 +1,4 @@
-package com.younghu.android.socialtruth.ui.data;
+package com.younghu.android.socialtruth.data;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -6,9 +6,13 @@ import android.os.Parcelable;
 public class Question implements Parcelable {
 
     private String question;
+    private String questionId;
     private String authorId;
+    private String authorUserName;
     private String authorPhotoUrl;
     private String photoUrl;
+    private String isAnswered;
+
 
     public static final Parcelable.Creator<Question> CREATOR = new Parcelable.Creator<Question>(){
 
@@ -28,16 +32,23 @@ public class Question implements Parcelable {
 
     public Question(Parcel parcel) {
         question = parcel.readString();
+        questionId = parcel.readString();
         authorId = parcel.readString();
+        authorUserName = parcel.readString();
         authorPhotoUrl = parcel.readString();
         photoUrl = parcel.readString();
+        isAnswered = parcel.readString();
     }
 
-    public Question(String question, String authorId, String authorPhotoUrl, String photoUrl) {
+    public Question(String question, String questionId, String authorId,
+                    String authorUserName, String authorPhotoUrl, String photoUrl, String isAnswered) {
         this.question = question;
+        this.questionId = questionId;
         this.authorId = authorId;
+        this.authorUserName = authorUserName;
         this.authorPhotoUrl = authorPhotoUrl;
         this.photoUrl = photoUrl;
+        this.isAnswered = isAnswered;
     }
 
     public String getQuestion() {
@@ -48,6 +59,14 @@ public class Question implements Parcelable {
         this.question = question;
     }
 
+    public String getQuestionId() {
+        return questionId;
+    }
+
+    public void setQuestionId(String questionId) {
+        this.questionId = questionId;
+    }
+
     public String getAuthorId() {
         return authorId;
     }
@@ -55,6 +74,10 @@ public class Question implements Parcelable {
     public void setAuthorId(String authorId) {
         this.authorId = authorId;
     }
+
+    public String getAuthorUserName() { return authorUserName; }
+
+    public void setAuthorUserName(String authorUserName) { this.authorUserName = authorUserName; }
 
     public String getAuthorPhotoUrl() {
         return authorPhotoUrl;
@@ -72,6 +95,14 @@ public class Question implements Parcelable {
         this.photoUrl = photoUrl;
     }
 
+    public String getIsAnswered() {
+        return isAnswered;
+    }
+
+    public void setIsAnswered(String isAnswered) {
+        this.isAnswered = isAnswered;
+    }
+
     @Override
     public int describeContents() {
         return hashCode();
@@ -80,8 +111,11 @@ public class Question implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(question);
+        dest.writeString(questionId);
         dest.writeString(authorId);
+        dest.writeString(authorUserName);
         dest.writeString(authorPhotoUrl);
         dest.writeString(photoUrl);
+        dest.writeString(isAnswered);
     }
 }

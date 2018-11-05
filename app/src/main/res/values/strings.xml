@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">Social Truth</string>
     <string name="action_settings">Settings</string>
+    <string name="edit_profile">Edit profile</string>
+    <string name="sign_out">Sign out</string>
+
+
     <string name="title_activity_login">Sign in</string>
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
@@ -33,5 +37,9 @@
     <string name="click_image_button">Click Image Button</string>
     <string name="your_question">Your question</string>
     <string name="create">Create</string>
+    <string name="profile">Profile</string>
+    <string name="questions">Questions</string>
+    <string name="profile_image_displayed">Profile_Image_displayed</string>
+    <string name="id">ID</string>
 
 </resources>

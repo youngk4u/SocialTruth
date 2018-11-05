@@ -7,7 +7,8 @@
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingBottom="24dp">
 
         <ImageButton
             android:id="@+id/imageButton"
@@ -54,7 +55,9 @@
             android:layout_marginStart="64dp"
             android:layout_marginEnd="64dp"
             android:enabled="false"
+            android:fontFamily="sans-serif-light"
             android:textColor="@drawable/text_colors"
+            android:textSize="24sp"
             android:text="@string/create"/>
 
     </android.support.constraint.ConstraintLayout>

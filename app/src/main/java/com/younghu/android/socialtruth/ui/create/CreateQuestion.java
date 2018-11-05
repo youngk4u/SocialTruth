@@ -27,16 +27,20 @@ import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.younghu.android.socialtruth.R;
-import com.younghu.android.socialtruth.ui.data.Question;
-import com.younghu.android.socialtruth.ui.main.MainActivity;
+import com.younghu.android.socialtruth.data.Question;
+import com.younghu.android.socialtruth.data.User;
+import com.younghu.android.socialtruth.data.Vote;
+
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -50,17 +54,21 @@ public class CreateQuestion extends AppCompatActivity {
     @BindView(R.id.progress) ProgressBar progressBar;
 
     private FirebaseDatabase mFirebaseDatabase;
-    private DatabaseReference mDatabaseReference;
-    private ChildEventListener mChildEventListner;
+    private DatabaseReference mQuestionDatabaseReference;
+    private DatabaseReference mVoteDatabaseReference;
+    private DatabaseReference mYesVoteDatabaseReference;
+    private DatabaseReference mNoVoteDatabaseReference;
+    private DatabaseReference mUserDatabaseReference;
+
     private FirebaseAuth mFirebaseAuth;
-    private FirebaseAuth.AuthStateListener mAuthStateListner;
     private FirebaseStorage mFirebaseStorage;
     private StorageReference mQuestionPhotosStorageReference;
 
-    private String mUsername;
+    private String mUserId;
+    private String mUserName;
     private String mUserPhotoUrl;
-    private String mPhotoUrl = "http://goo.gl/gEgYUd";
-    public static final int RC_SIGN_IN = 1;
+    private String mPhotoUrl = "http://qoopapp.com/testsite/img/PoyoSquared.png";
+    private User mUser;
     private static final int RC_PHOTO_PICKER =  2;
     private static final int DEFAULT_MSG_LENGTH_LIMIT = 140;
 
@@ -74,14 +82,32 @@ public class CreateQuestion extends AppCompatActivity {
 
         // FirebaseDatabase
         mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mFirebaseAuth = mFirebaseAuth.getInstance();
-        mFirebaseStorage = FirebaseStorage.getInstance();
-        mDatabaseReference = mFirebaseDatabase.getReference().child("questions");
+        mFirebaseAuth     = FirebaseAuth.getInstance();
+        mFirebaseStorage  = FirebaseStorage.getInstance();
+        mQuestionDatabaseReference = mFirebaseDatabase.getReference().child("questions");
+        mVoteDatabaseReference     = mFirebaseDatabase.getReference().child("votes");
+        mUserDatabaseReference     = mFirebaseDatabase.getReference().child("users");
+        mYesVoteDatabaseReference  = mFirebaseDatabase.getReference().child("yes_voters");
+        mNoVoteDatabaseReference   = mFirebaseDatabase.getReference().child("no_voters");
         mQuestionPhotosStorageReference = mFirebaseStorage.getReference().child("question_photos");
 
-        FirebaseUser user = mFirebaseAuth.getCurrentUser();
-        mUsername = user.getDisplayName();
-        mUserPhotoUrl = user.getPhotoUrl().toString();
+        mUserDatabaseReference.child(Objects.requireNonNull(mFirebaseAuth.getUid()))
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                mUser = dataSnapshot.getValue(User.class);
+                if (mUser != null) {
+                    mUserId = mUser.getId();
+                    mUserName = mUser.getUsername();
+                    mUserPhotoUrl = mUser.getPhotoUrl();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         // imageButton shows an image picker to upload a image for a message
         imageButton.setOnClickListener(new View.OnClickListener() {
@@ -116,19 +142,26 @@ public class CreateQuestion extends AppCompatActivity {
             }
         });
         questionEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(DEFAULT_MSG_LENGTH_LIMIT)});
-
     }
 
+
+    // Initiate new question and vote object in Firebasedatabase
     @OnClick(R.id.createButton)
     public void createButton(View view) {
-        Question sampleQuestion = new Question(questionEditText.getText().toString(), mUsername, mUserPhotoUrl, mPhotoUrl);
-        mDatabaseReference.push().setValue(sampleQuestion);
+        createButton.setEnabled(false);
 
-        // Clear input box
-        questionEditText.setText("");
+        String questionId = mQuestionDatabaseReference.push().getKey();
 
-        Intent mainIntent = new Intent(CreateQuestion.this, MainActivity.class);
-        startActivity(mainIntent);
+        if (questionId != null) {
+            Question sampleQuestion = new Question(questionEditText.getText().toString(), questionId,
+                    mUserId, mUserName, mUserPhotoUrl, mPhotoUrl, "Not Voted");
+            Vote vote = new Vote(0, 0, questionId, 0, 0);
+
+            mQuestionDatabaseReference.child(questionId).setValue(sampleQuestion);
+            mVoteDatabaseReference.child(questionId).setValue(vote);
+        }
+
+        finish();
     }
 
     @Override
@@ -136,7 +169,8 @@ public class CreateQuestion extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_PHOTO_PICKER && resultCode == RESULT_OK) {
             Uri selectedImageUri = data.getData();
-            final StorageReference photoRef = mQuestionPhotosStorageReference.child(selectedImageUri.getLastPathSegment());
+            final StorageReference photoRef =
+                    mQuestionPhotosStorageReference.child(selectedImageUri.getLastPathSegment());
 
             photoRef.putFile(selectedImageUri).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
                 @Override
@@ -154,15 +188,19 @@ public class CreateQuestion extends AppCompatActivity {
                         if (downloadUri != null) {
                             mPhotoUrl = downloadUri.toString();
                             Glide.with(getApplicationContext())
-                                    .load(downloadUri)
+                                    .load(mPhotoUrl)
                                     .listener(new RequestListener<Drawable>() {
                                         @Override
-                                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                                        public boolean onLoadFailed(@Nullable GlideException e,
+                                                                    Object model, Target<Drawable> target,
+                                                                    boolean isFirstResource) {
                                             progressBar.setVisibility(View.GONE);
                                             return false;
                                         }
                                         @Override
-                                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                                        public boolean onResourceReady(Drawable resource, Object model,
+                                                                       Target<Drawable> target,
+                                                                       DataSource dataSource, boolean isFirstResource) {
                                             progressBar.setVisibility(View.GONE);
                                             return false;
                                         }
@@ -171,7 +209,8 @@ public class CreateQuestion extends AppCompatActivity {
                                     .into(imageButton);
                         }
                     } else {
-                        Toast.makeText(CreateQuestion.this, "upload failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(CreateQuestion.this, "upload failed: " +
+                                task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 }
             });

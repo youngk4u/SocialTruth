@@ -1,25 +1,25 @@
-package com.younghu.android.socialtruth.ui.data;
+package com.younghu.android.socialtruth.data;
 
 public class User {
     private String id;
     private String username;
     private String email;
     private String photoUrl;
-    private int postCount;
 
-    public User(String id, String username, String email, String photoUrl, int postCount) {
+    public User(String id, String username, String email, String photoUrl) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.photoUrl = photoUrl;
-        this.postCount = postCount;
     }
 
-    public User(String id, String username, String email, int postCount) {
+    public User() {
+    }
+
+    public User(String id, String username, String email) {
         this.id = id;
         this.username = username;
         this.email = email;
-        this.postCount = postCount;
     }
 
     public String getId() {
@@ -54,11 +54,4 @@ public class User {
         this.photoUrl = photoUrl;
     }
 
-    public int getPostCount() {
-        return postCount;
-    }
-
-    public void setPostCount(int postCount) {
-        this.postCount = postCount;
-    }
 }
