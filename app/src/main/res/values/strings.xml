@@ -41,5 +41,7 @@
     <string name="questions">Questions</string>
     <string name="profile_image_displayed">Profile_Image_displayed</string>
     <string name="id">ID</string>
+    <string name="appwidget_text">Social Truth</string>
+    <string name="add_widget">Add widget</string>
 
 </resources>

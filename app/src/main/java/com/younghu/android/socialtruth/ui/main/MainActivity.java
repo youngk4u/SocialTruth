@@ -1,5 +1,7 @@
 package com.younghu.android.socialtruth.ui.main;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -26,6 +28,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.younghu.android.socialtruth.R;
 import com.younghu.android.socialtruth.adapter.QuestionAdapter;
+import com.younghu.android.socialtruth.data.QuestionsViewModel;
 import com.younghu.android.socialtruth.data.User;
 import com.younghu.android.socialtruth.ui.create.CreateQuestion;
 import com.younghu.android.socialtruth.data.Question;
@@ -34,6 +37,7 @@ import com.younghu.android.socialtruth.ui.vote.VoteActivity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -85,16 +89,6 @@ public class MainActivity extends AppCompatActivity
         mResultDatabaseReference  = mFirebaseDatabase.getReference().child("voter_results");
         mQuestionPhotosStorageReference = mFirebaseStorage.getReference().child("question_photos");
 
-        layoutManager = new LinearLayoutManager(MainActivity.this);
-        layoutManager.setReverseLayout(true);
-        layoutManager.setStackFromEnd(true);
-        questions = new ArrayList<>();
-        questionAdapter = new QuestionAdapter(this, this);
-        questionAdapter.swapList(questions);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setHasFixedSize(false);
-        recyclerView.setAdapter(questionAdapter);
-
         mAuthStateListner = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -130,6 +124,27 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         };
+
+        layoutManager = new LinearLayoutManager(MainActivity.this);
+        layoutManager.setReverseLayout(true);
+        layoutManager.setStackFromEnd(true);
+        questions = new ArrayList<>();
+        questionAdapter = new QuestionAdapter(this, this);
+        questionAdapter.swapList(questions);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setHasFixedSize(false);
+        recyclerView.setAdapter(questionAdapter);
+
+        // ViewModel that persists lists of Question objects
+        QuestionsViewModel viewModel = ViewModelProviders.of(this).get(QuestionsViewModel.class);
+        viewModel.getQuestions().observe(this, new Observer<List<Question>>() {
+            @Override
+            public void onChanged(@Nullable List<Question> mQuestions) {
+                for (Question question: mQuestions) {
+                    getVoterResult(question, mResultDatabaseReference);
+                }
+            }
+        });
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -212,10 +227,14 @@ public class MainActivity extends AppCompatActivity
     private void onSignedOutCleanup() {
         mUsername = ANONYMOUS;
         questionAdapter.swapList(null);
-        questions.clear();
+        //questions.clear();
         detachDatabaseReadListner();
     }
 
+    /**
+     * This Listener gets triggered when there's new child or child data
+     * is changed for question objects.
+     */
     private void attachDatabaseReadListner() {
         if (mChildEventListener == null) {
             mChildEventListener = new ChildEventListener() {
@@ -244,6 +263,10 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * This Listener gets triggered when there's new child or child data
+     * is changed for votes in Firebase Realtime Database
+     */
     public void attachVoteDbReadListener() {
         if (mVoteListener == null) {
             mVoteListener = new ChildEventListener() {
@@ -263,6 +286,7 @@ public class MainActivity extends AppCompatActivity
                         index++;
                     }
                     questionAdapter.notifyDataSetChanged();
+
                 }
                 @Override
                 public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
@@ -304,38 +328,48 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+
+    /**
+     * This method queries and listens for any activityies in Voter_result database.
+     *
+     * @param question object that's passed for queries
+     * @param ref Firebase DatabaseReference object for voter_result
+     */
     private void getVoterResult(final Question question, final DatabaseReference ref) {
-        Query mQuery = ref.child(question.getQuestionId()).child(mUserId);
-        mQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    String result = dataSnapshot.getValue(String.class);
-                    question.setIsAnswered(result);
-                } else {
-                    question.setIsAnswered(NOT_VOTED_YET);
-                }
-
-                boolean questionExists = false;
-                for (int i = 0; i < questions.size(); i++) {
-                    if (questions.get(i).getQuestion().equals(question.getQuestion())) {
-                        questions.remove(i);
-                        questions.add(i, question);
-                        questionExists = true;
-                        break;
+        if (mUserId != null) {
+            Query mQuery = ref.child(question.getQuestionId()).child(mUserId);
+            mQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        String result = dataSnapshot.getValue(String.class);
+                        question.setIsAnswered(result);
+                    } else {
+                        question.setIsAnswered(NOT_VOTED_YET);
                     }
-                }
-                if (!questionExists) {
-                    questions.add(question);
-                }
-                questionAdapter.swapList(questions);
-                layoutManager.smoothScrollToPosition(recyclerView, null,
-                        questionAdapter.getItemCount());
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        });
+                    boolean questionExists = false;
+                    for (int i = 0; i < questions.size(); i++) {
+                        if (questions.get(i).getQuestion().equals(question.getQuestion())) {
+                            questions.remove(i);
+                            questions.add(i, question);
+                            questionExists = true;
+                            break;
+                        }
+                    }
+                    if (!questionExists) {
+                        questions.add(question);
+                    }
+                    questionAdapter.swapList(questions);
+                    layoutManager.smoothScrollToPosition(recyclerView, null,
+                            questionAdapter.getItemCount());
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                }
+            });
+        }
     }
 }

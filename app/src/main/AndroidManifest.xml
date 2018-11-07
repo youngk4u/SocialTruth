@@ -25,10 +25,22 @@
         </activity>
         <activity android:name=".ui.vote.VoteActivity" />
         <activity android:name=".ui.create.CreateQuestion" />
-        <activity android:name=".ui.profile.ProfileActivity"
-            android:theme="@style/AppThemeAlternative"/>
-        <activity android:name=".ui.profile.EditProfileActivity"
-            android:theme="@style/AppThemeAlternative"/>
+        <activity
+            android:name=".ui.profile.ProfileActivity"
+            android:theme="@style/AppThemeAlternative" />
+        <activity
+            android:name=".ui.profile.EditProfileActivity"
+            android:theme="@style/AppThemeAlternative" />
+
+        <receiver android:name=".widget.QuestionAppWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/question_app_widget_info" />
+        </receiver>
     </application>
 
 </manifest>

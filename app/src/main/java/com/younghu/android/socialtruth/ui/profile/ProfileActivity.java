@@ -107,6 +107,7 @@ public class ProfileActivity extends AppCompatActivity
 
         userViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
 
+        // LiveData that persist user data
         LiveData<User> userLiveData = userViewModel.getUserLiveData();
         userLiveData.observe(this, new Observer<User>() {
             @Override
@@ -118,6 +119,34 @@ public class ProfileActivity extends AppCompatActivity
                         .into(profileImage);
             }
         });
+    }
+
+    private void attachDatabaseReadListner() {
+        if (mChildEventListener == null) {
+            mChildEventListener = new ChildEventListener() {
+                @Override
+                public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                    Question question = dataSnapshot.getValue(Question.class);
+                    if (question != null && question.getAuthorId().equals(mUser.getUid())) {
+                        getVoterResult(question, mResultDatabaseReference);
+                    }
+                }
+                @Override
+                public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                    Question question = dataSnapshot.getValue(Question.class);
+                    if (question != null && question.getAuthorId().equals(mUser.getUid())) {
+                        getVoterResult(question, mResultDatabaseReference);
+                    }
+                }
+                @Override
+                public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) { }
+                @Override
+                public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) { }
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) { }
+            };
+            mDatabaseReference.addChildEventListener(mChildEventListener);
+        }
     }
 
     public void attachVoteDbReadListener() {
@@ -169,34 +198,6 @@ public class ProfileActivity extends AppCompatActivity
                 public void onCancelled(@NonNull DatabaseError databaseError) { }
             };
             mResultDatabaseReference.addChildEventListener(mVoteListener);
-        }
-    }
-
-    private void attachDatabaseReadListner() {
-        if (mChildEventListener == null) {
-            mChildEventListener = new ChildEventListener() {
-                @Override
-                public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                    Question question = dataSnapshot.getValue(Question.class);
-                    if (question != null && question.getAuthorId().equals(mUser.getUid())) {
-                        getVoterResult(question, mResultDatabaseReference);
-                    }
-                }
-                @Override
-                public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                    Question question = dataSnapshot.getValue(Question.class);
-                    if (question != null && question.getAuthorId().equals(mUser.getUid())) {
-                        getVoterResult(question, mResultDatabaseReference);
-                    }
-                }
-                @Override
-                public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) { }
-                @Override
-                public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) { }
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) { }
-            };
-            mDatabaseReference.addChildEventListener(mChildEventListener);
         }
     }
 

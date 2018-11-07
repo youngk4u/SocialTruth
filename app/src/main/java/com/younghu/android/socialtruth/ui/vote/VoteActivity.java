@@ -44,7 +44,6 @@ public class VoteActivity extends AppCompatActivity {
     private Vote mVote;
     private double percentage = 0;
 
-    private static String NOT_VOTED_YET = "Not Voted";
     private static String VOTED_YES = "Yes";
     private static String VOTED_NO = "No";
 
@@ -155,6 +154,12 @@ public class VoteActivity extends AppCompatActivity {
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
     }
 
+
+    /**
+     * This method queries votes database and updates as the data gets added or changed
+     *
+     * @param voteResult is compared with the user vote and sets the result to Database
+     */
     private void voteQuery(final String voteResult) {
         Query query = mVoteDatabaseReference.child(mQuestion.getQuestionId());
         query.addListenerForSingleValueEvent(new ValueEventListener() {
