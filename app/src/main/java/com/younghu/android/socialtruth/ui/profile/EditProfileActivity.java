@@ -47,9 +47,12 @@ import butterknife.ButterKnife;
 
 public class EditProfileActivity extends AppCompatActivity {
 
-    @BindView(R.id.nameEditText) EditText nameEditText;
-    @BindView(R.id.imageEditButton) ImageButton imageButton;
-    @BindView(R.id.progress) ProgressBar progressBar;
+    @BindView(R.id.nameEditText)
+    EditText nameEditText;
+    @BindView(R.id.imageEditButton)
+    ImageButton imageButton;
+    @BindView(R.id.progress)
+    ProgressBar progressBar;
 
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mDatabaseReference;
@@ -154,6 +157,7 @@ public class EditProfileActivity extends AppCompatActivity {
                                             progressBar.setVisibility(View.GONE);
                                             return false;
                                         }
+
                                         @Override
                                         public boolean onResourceReady(Drawable resource, Object model,
                                                                        Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {

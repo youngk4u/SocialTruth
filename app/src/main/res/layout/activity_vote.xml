@@ -64,7 +64,7 @@
                         android:layout_height="wrap_content"
                         card_view:layout_constraintTop_toBottomOf="@id/authorLayout"
                         android:textSize="28sp"
-                        android:fontFamily="sans-serif-thin"
+                        android:fontFamily="sans-serif-light"
                         android:textColor="@color/colorBlack"
                         android:paddingTop="8dp"
                         android:paddingLeft="16dp"

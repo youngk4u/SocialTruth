@@ -14,7 +14,7 @@
         android:background="@color/colorWhite"
         android:contentDescription="@string/appwidget_text"
         android:text="@string/appwidget_text"
-        android:textColor="@color/colorBlack"
+        android:textColor="@color/colorPrimaryDark"
         android:textSize="24sp"
         android:textStyle="bold|italic" />
 
